@@ -98,12 +98,14 @@ public class TankMovement : MonoBehaviour
     private void Move()
     {
         if (m_PlayerNumber == 1) return;
-        
-        Vector3 movement=Vector3.zero;
-        // Adjust the position of the tank based on the player's input.
-        if (SteamVR_Actions._default.Teleport.GetState(hand))
-            movement = transform.forward * m_Speed * Time.deltaTime;
+        if (Mathf.Abs(SteamVR_Actions._default.MovementPad.axis.x) > 0.5) return;
 
+        Vector3 movement = Vector3.zero;
+        if (SteamVR_Actions._default.MovementPad.axis.y < 0)
+            movement += m_Speed * Time.deltaTime * -transform.forward;
+        else if (SteamVR_Actions._default.MovementPad.axis.y > 0)
+            movement += m_Speed * Time.deltaTime * transform.forward;
+        
         m_Rigidbody.MovePosition(m_Rigidbody.position + movement);
     }
 
@@ -113,11 +115,12 @@ public class TankMovement : MonoBehaviour
         // Adjust the rotation of the tank based on the player's input.
         if (m_PlayerNumber == 1) return;
 
+        if (Mathf.Abs(SteamVR_Actions._default.MovementPad.axis.x) <= 0.5) return;
         float turn=0;
         
-        if (SteamVR_Actions._default.SnapTurnLeft.GetState(hand))
+        if (SteamVR_Actions._default.MovementPad.axis.x < 0)
             turn = -1 * m_TurnSpeed * Time.deltaTime;
-        else if (SteamVR_Actions._default.SnapTurnRight.GetState(hand))
+        else if (SteamVR_Actions._default.MovementPad.axis.x > 0)
             turn = 1 * m_TurnSpeed * Time.deltaTime;
             
         Quaternion turnRotation = Quaternion.Euler(0f, turn, 0f);
